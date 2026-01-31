@@ -1,0 +1,12 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^python3 export_nb\\.py 1_real_data\\.ipynb 1_real_data_code\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python3 export_nb\\.py 2_visualize\\.ipynb 2_visualize_code\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

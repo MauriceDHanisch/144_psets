@@ -1,0 +1,249 @@
+\documentclass[11pt]{article}
+\setlength{\textwidth6.5in} \setlength{\textheight8.8in}
+\setlength{\oddsidemargin0in} \setlength{\topmargin-0.3in}
+\setlength{\unitlength}{1cm}
+
+\def\squarebox#1{\hbox to #1{\hfill\vbox to #1{\vfill}}}
+\newcommand{\qedbox}{\vbox{\hrule\hbox{\vrule\squarebox{.667em}\vrule}\hrule}}
+\newcommand{\qed}{\nopagebreak\mbox{}\hfill\qedbox\bigskip}
+\newcommand{\comment}[1]{}
+%\def\solution{\textbf{Solution: }}
+\newcommand{\solution}[1]{{\ \\ \noindent\bf Solution: } #1}
+
+% whether this is for a solution or not
+\newif\ifsol
+\solfalse
+
+\ifsol
+\def\includesolution{\input}
+\else
+\def\includesolution{\comment}
+\fi
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage{graphics, graphicx, subcaption}
+%\usepackage[english]{babel}
+\usepackage{amssymb, amsmath, amsfonts}
+\usepackage{framed}
+\usepackage{enumerate}
+\usepackage{enumitem}
+
+\usepackage{hyperref}
+
+\newcommand{\ra}{\rightarrow}
+\newcommand{\ua}{\uparrow}
+\newcommand{\prob}[1]{P\left(#1\right)}
+\newcommand{\imp}{\Rightarrow}
+\newcommand{\re}{\mathbb{R}}
+\newcommand{\Exp}[1]{\mathbb{E}\left[#1\right]} %Expectation
+
+
+\usepackage{graphicx, subcaption}
+\usepackage{listings}
+\usepackage{color}
+
+\lstset{language=Python}
+ 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+
+\lstset{
+    frame=single,
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=t,                    
+    numbers=left,
+    numbersep=5pt,
+    keepspaces=true,                 
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4,
+    basicstyle=\ttfamily\footnotesize,
+}
+
+
+
+\begin{document}
+
+%-----------------This is the header/topics portion--------------------
+\noindent \rule{\textwidth}{.5mm} \noindent \makebox[1.5in][l]
+{\bf CMS/CS/EE/IDS 144}  \hfill  \makebox[1.5in][r]{\bf Gurus: Tia \& Allison}
+
+\noindent \centerline{\bf {\Large Homework 2: Visualizing Networks}}
+
+\noindent \makebox[1.5in][l]{Assigned: 01/15/26}  \hfill
+\makebox[1.5in][r]{Due: 01/22/26 5:00pm PT} \noindent
+\rule{\textwidth}{.5mm}
+
+%-----------------This is the header/topics portion--------------------
+
+\noindent \textit{Collaboration is allowed for all problems and at the top of your homework sheet, please list all the people
+with whom you discussed. Crediting help from other classmates will not take away any credit from you.
+The details of the collaboration policy for this course are available in the Resources tab on Piazza.\\}
+
+\noindent\textit{You must turn in your homework electronically via Gradescope. \textbf{Be sure to submit your homework as a single file.} }\\
+
+\noindent\textit{Start early and come to office hours with your questions! We also encourage you to post your questions on Piazza, as well as answer the questions asked by others on Piazza.}
+
+
+\noindent \rule{6in}{0.4pt}
+\section*{Coding + Data Analysis [70 points]}
+\rule{6in}{0.4pt}
+\section*{1. Working with real data [30 points]}
+\label{prob:realdata}
+
+We'll now look for first hand evidence of the `universal properties' by studying a real world dataset. We'll work with a collaboration network between researchers working in the area of General Relativity and Quantum Cosmology. If an author $i$ co-authored a paper with author $j$, the graph contains a undirected edge from $i$ to $j$. If the paper is co-authored by $k$ authors this generates a completely connected (sub)graph on $k$ nodes. The original dataset contains 5242 nodes, but we'll work with the largest connected component of this network, consisting of 4158 nodes. You can download the text file from the file called \textbf{gr\_qc\_coauthorships.txt} on piazza under the resources tab, each line of which contains an edge in the network.
+
+
+\begin{enumerate}[label=(\alph*)]
+\item \textbf{[10 points]} Plot the histogram, as well as a complementary cumulative distribution function (ccdf) of the node degrees. Compute the average clustering coefficient, the overall clustering coefficient, the maximal diameter, and the average diameter.
+\item \textbf{[10 points]} Calculate the number of triangles $T$. Assuming $T = \Exp T$, the expected number of triangles of a Erd\H{o}s--R\'{e}nyi graph with the same number of nodes (4158), calculate the parameter $p$ of the Erd\H{o}s--R\'{e}nyi graph $G(n, p)$.
+\item \textbf{[10 points]} What distribution should the node degrees of a Erd\H{o}s--R\'{e}nyi graph take on? Is the Erd\H{o}s--R\'{e}nyi model a good model for this graph (use the histogram from part a). Do we need the histogram to conclude this? Think of where the data came from.
+
+\end{enumerate}
+
+\noindent {\bf Note:} It is okay (recommended!) to use existing network libraries (e.g., networkx for python) to do the calculations.  If you do this, please specify the library and the functions you are using.
+
+\section*{2. Visualize your network [15 points]}
+
+In this problem, we will familiarize ourselves with the importance and challenges of visualizing networks. More specifically, we will be visualizing the {\em Erd\H{o}s--R\'{e}nyi} model (which we've seen in class), the symmetric stochastic block model (a generalization of the {\em Erd\H{o}s--R\'{e}nyi} model we will study later in the class), and the web graph that we generated in Problem Set 1. \\
+
+\noindent Before starting your task, we'll first introduce the stochastic block model, which is an important tool when studying clustering algorithms.  The \textit{stochastic block model (SBM)} is a random graph model with planted clusters. The model $SBM(n, p, W)$ defines an $n$-vertex random graph with labeled vertices for positive integers $n$, $k$, a probability vector $p$ of dimension $k$, and a symmetric matrix $W$ of dimension $k \times k$ with entries $W_{i,j} \in [0, 1]$. Each vertex is assigned a community label in $\{1,..., k\}$ independently under the community prior $p$, and pairs of vertices with community labels $i$ and $j$ connect independently with probability $W_{i,j}$. The SBM is called \emph{symmetric} if $p$ is uniform and if $W$ takes the same value $A$ on the diagonal and the same value $B$ outside the diagonal. We can represent the symmetric SBM as $SSBM(n, k, A, B)$. \\
+
+\noindent \textbf{Note:} For this problem, you only need to consider simple graphs with no self-loops or parallel edges.\\
+
+\noindent\textbf{Your task}: Visualize the following three networks:
+
+\begin{enumerate}[label=(\alph*)]
+    \item \textbf{Erd\H{o}s--R\'{e}nyi [4 points]}: Sample a network from the {\em Erd\H{o}s--R\'{e}nyi} model with $n = 40$ vertices where every possible edge between vertices occurs independently with probability $p = 0.23$. 
+    
+    \item \textbf{Symmetric Stochastic Block [4 points]}: Sample a network from the symmetric stochastic block model with $n = 30$ vertices, $k = 3$ communities, $A = 0.7$, and $B = 0.1$.
+    
+    \item \textbf{The web [7 points]}: Create two networks using the first $n$ nodes crawled by the web crawler that you created in Problem Set 1. One with $n = 100$ nodes and one with $n = 300$ nodes. 
+\end{enumerate}
+
+\noindent Specifically, for each network, you should:
+
+ \begin{itemize}
+     \item Write a function that can generate a network for both $G(n,p)$ and $SSBM(n, k, A, B)$. Please avoid using direct functions (e.g., networkx.generators.random\_graphs.erdos\_renyi\_graph). Include your code as part of your pdf submission.
+     
+     \item Visualize the network. You may use existing network libraries (e.g., networkx for Python). Play around with the visual presentations of the networks, such as layout (e.g., random, radial, spring), colors, node sizes, edge thickness, etc. Consider the most effective way to convey the information presented by this type of network. Present two visualizations that provide contrasting perspectives on the network. 
+     
+     \textbf{Note:} In addition to networkx.drawing.layout, Graphviz (networkx.drawing.nx\_pydot.graphviz\_layout) also has some useful layouts to explore. 
+     
+     \item Provide analysis of the visualization. Discuss the effectiveness of the different forms of network visualizations you explored, including whether different visualizations were more effective for the different networks.  Explain any advantages or drawbacks of the approaches that you experimented with.  
+     
+ \end{itemize}
+
+\section*{3. The Navigation Paradox [25 points]}
+
+In Lecture 4, we saw that adding random edges to a ring lattice drastically reduces the diameter, creating a ``small world.'' However, we also discussed a critical flaw: while short paths exist, decentralized agents (like people passing a letter) cannot necessarily find them if the shortcuts are purely random. In this problem, you will demonstrate this paradox by simulating a greedy search on a 1-dimensional Watts-Strogatz ring.
+
+\begin{enumerate}[label=(\alph*)]
+    \item \textbf{[5 points]} Use a library (like \texttt{networkx}) to generate a Watts-Strogatz small world graph. Set $n=1000$ nodes, $k=10$ (each node connects to 5 neighbors on each side), and rewiring probability $p=0.1$. (If the generated graph is disconnected, regenerate it until it is connected.)
+    \item \textbf{[5 points]} Since the nodes are arranged in a ring labeled $0$ to $n-1$, the distance between two nodes $u$ and $v$ is the minimum steps along the ring circumference:
+    $$ d_{ring}(u, v) = \min(|u-v|, n - |u-v|) $$
+    Implement a helper function to calculate this distance.
+    \item \textbf{[10 points]} Select 100 random pairs of source and target nodes $(s, t)$ and calculate the path length using two different methods:
+    \begin{itemize}
+        \item \textbf{Method 1:} Use the built-in shortest path function (i.e., \texttt{nx.shortest\_path\_length}) to find the actual distance between $s$ and $t$ utilizing all shortcuts optimally.
+    \item \textbf{Method 2:} Implement a simple greedy routing algorithm:
+    \begin{itemize}
+        \item Start at node $s$.
+        \item At each step, examine the current node's neighbors (both local ring neighbors and random shortcut neighbors).
+        \item Move to the neighbor that minimizes the ring distance $d_{ring}$ to the target $t$.
+        \item Repeat until you reach $t$. Count the number of hops.
+    \end{itemize}
+    \textbf{Implementation Note:} Theoretically, because the ring neighbors always exist, the distance will strictly decrease at every step. However, feel free to add a termination condition (i.e., stop if hops $> n$) to prevent infinite loops if your distance logic has a bug.
+    \end{itemize}
+    Calculate the average path length for method 1 and method 2 over your 100 samples.
+
+    \item \textbf{[5 points]} You should find that the true shortest path is very small (characteristic of a small world), but the greedy search is significantly worse. Why does the greedy agent fail to utilize the random shortcuts effectively?
+\end{enumerate}
+
+\newpage 
+\noindent \rule{6in}{0.4pt}
+\section*{Theory [30 Points]}
+\rule{6in}{0.4pt}
+
+\section*{4. Getting to know  \textit{Erd\H{o}s--R\'{e}nyi} [20 points]}
+
+
+In class, we've talked a bit about the {\em Erd\H{o}s--R\'{e}nyi}
+random graph model and begun to explore how well it models the four
+``universal'' properties that we've been focusing on.  In this
+problem, you will revisit two of these four properties and prove
+some additional results.\\
+
+\noindent Recall, the {\em Erd\H{o}s--R\'{e}nyi}
+random graph model creates an undirected random graph, denoted by
+$G(n,p),$ by considering $n$ vertices and letting every possible
+edge between vertices occur independently with probability $p$.\\
+
+\noindent Since we already showed in class that the degree of any vertex in a $G(n, p)$ is binomially distributed, in this problem we will focus on clustering and diameter.
+
+\subsection*{(a) Clustering [10 points]}
+\begin{enumerate}[label=(\roman*)]
+    \item \textbf{[1 point]} Calculate the expected number of triangles, denoted $E[T]$, that $G(n,p)$ contains. 
+    \item \textbf{[2 points]} Prove that $E[T]$ has a threshold. Specifically, find a function $\pi(n)$ such that $\lim_{n \ra \infty} \Exp{T} = \infty$ if $p \in \omega(\pi(n))$ and $\lim_{n \ra \infty} \Exp{T} = 0$ if $p \in o(\pi(n))$?\footnote{
+        In this problem, all functions are with respect to $n$ unless otherwise stated.
+        For a reminder on the notation, please consult \url{https://en.wikipedia.org/wiki/Big\_O\_notation\#Family\_of\_Bachmann\%E2\%80\%93Landau\_notations}
+    }
+\end{enumerate}
+
+
+\noindent Let $X$ be the event that a triangle is contained in $G$. Note that the previous part is insufficient to show that $\pi(n)$ is a threshold for $X$ (not for credit, but think about why!).
+But we can show this fact with second moment method -- the same way we proved the result for isolated vertices in class. Since the general case is a bit nasty, we will focus on a specific setting here: $p(n) = \pi(n)\log(n)$.
+
+\begin{enumerate}[resume, label=(\roman*)]
+    \item \textbf{[5 points]} Show that $\text{Var}(T) \in \Theta(\log^3(n))$. \textbf{Hint:} First think of how to express $T$ as sum of 0-1 random variables.  Then, use case-work to understand the covariance terms that result.
+    \item \textbf{[2 points]} Use Chebyshev's Inequality to show that $\Pr(T = 0) \in o(1)$.
+        Conclude that $\lim_{n\to\infty} \Pr(X) = 1$ for this particular $p$.
+\end{enumerate}
+
+\subsection*{(b) Diameter [10 points]}
+Suppose $p \in (0,1)$ is held constant. Prove
+that the (maximal) diameter of $G(n,p)$ equals two with a probability that
+approaches 1 as $n$ becomes large; i.e., prove that:
+$$\lim_{n \ra \infty} \prob{diameter(G(n,p)) = 2} = 1.$$
+
+\section*{5. It's a small world after all [10 points]}
+
+We will see a few examples of small world models in class. Here, you'll develop another simple model that has small world properties.
+
+Consider the model in Figure \ref{fg: sw}. There are $n$ nodes
+arranged on a directed ring, labeled $A_1, \dots, A_n$. Every node is
+connected to the next node with a directed link of length $1$. We add
+a new central node $B$ to the network, and connect it with each of the
+nodes on the ring with probability $p$, using an undirected link of
+length $1/2$.
+\begin{figure}[h]
+  % Requires \usepackage{graphicx}
+  \centering \includegraphics[width=0.35\columnwidth]{sw_fig}\\
+  \caption{Graph model}\label{fg: sw}
+\end{figure}
+
+For the following, \textbf{feel free to use Mathematica and the FullSimplify function if necessary to obtain closed-form expressions for the final answers, as long as you attach your code}.
+
+\begin{enumerate}[label=(\alph*)]
+\item \textbf{[5 points]} Consider nodes $A_i$ and $A_j,$ $A_j$ being $k$ hops away from
+  $A_i$ along the ring. Compute the probability $P(l, k)$ that the
+  shortest path from node $A_i$ to node $A_j$ has length $l.$ What is
+  the expected value of the shortest path length from $A_i$ to $A_j$? 
+  
+  \textbf{Hint:} Think about two different cases: when $l < k$ and when $l = k$ (there are sub-cases in the second case).
+
+\item \textbf{[5 points]} Compute the expected average shortest path length between the
+  nodes on the ring of the graph. How does this quantity scale with
+  $n$? Contrast this with the case where the graph has no central
+  node.
+\end{enumerate}
+
+\end{document}

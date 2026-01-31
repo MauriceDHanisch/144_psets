@@ -1,0 +1,17 @@
+Analysis Report Summary
+
+--- Parallel ---
+Nodes: 2001
+Edges: 106638
+Average Clustering Coefficient: 0.7867
+Overall Clustering Coefficient: 0.5905
+Maximal Diameter: 4
+Average Diameter: 2.4183
+
+--- Sequential ---
+Nodes: 2000
+Edges: 91409
+Average Clustering Coefficient: 0.7526
+Overall Clustering Coefficient: 0.6106
+Maximal Diameter: 4
+Average Diameter: 2.5954

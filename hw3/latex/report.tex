@@ -1,0 +1,266 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{subcaption}
+\geometry{margin=1in}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10},
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    showstringspaces=false,
+    tabsize=4,
+    inputencoding=utf8,
+    extendedchars=true
+}
+
+\title{HW 3 Report}
+\author{Maurice Hanisch}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{AI Declaration}
+
+Most of the code and report text was written with use of AI tools. The ideas and analyses are my own.
+
+\section{Coding + Data Analysis}
+
+\subsection{Heavy vs. light}
+
+\subsubsection*{Part (a): Law of Large Numbers}
+
+Plots of $S_n$ vs. $n$ for the Normal, Weibull, and Pareto distributions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figs/plot_1.1_a_Standard_Normal.png}
+    \caption{Partial sums for Normal Distribution ($\mu=1, \sigma^2=1$). Left: First 20 samples. Right: All 10000 samples.}
+    \label{fig:normal_a}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figs/plot_1.1_a_Weibull.png}
+    \caption{Partial sums for Weibull Distribution ($\alpha=0.3, \mu=1$). Left: First 20 samples. Right: All 10000 samples.}
+    \label{fig:weibull_a}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figs/plot_1.1_a_Pareto.png}
+    \caption{Partial sums for Pareto Distribution ($\alpha=0.5, x_L=1/3$). Left: First 20 samples. Right: All 10000 samples.}
+    \label{fig:pareto_a}
+\end{figure}
+
+\paragraph{Interpretation}
+
+The Normal distribution (light-tailed) has a linear plot of $S_n$ vs $n$ because it has finite mean and variance. The cumulative sum grows steadily with slope approximately 1.
+
+The Weibull distribution ($\alpha=0.3$) is heavy-tailed but has finite mean and variance. Despite more variability than the Normal distribution, the plot remains approximately linear, showing that the Law of Large Numbers holds.
+
+The Pareto distribution ($\alpha=0.5$) has infinite mean, so the Law of Large Numbers fails. The plot is dominated by rare, extreme jumps. Single large values dwarf the sum of many smaller values, creating a staircase pattern rather than steady growth. The plot looks similar at both small ($n=20$) and large ($n=10000$) scales, reflecting the scale-invariant nature of the distribution.
+
+\subsubsection*{Part (b): Central Limit Theorem}
+
+Plot of $\frac{S_n - n\mathbb{E}[X]}{\sqrt{n}}$ vs. $n$ for Normal and Weibull distributions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figs/plot_1.1_b_CLT.png}
+    \caption{Scaled deviation of sum from mean ($\frac{S_n - n\mu}{\sqrt{n}}$) for Normal and Weibull distributions.}
+    \label{fig:clt_b}
+\end{figure}
+
+\paragraph{Interpretation}
+
+The Central Limit Theorem states that for i.i.d. samples with mean $\mu$ and finite variance $\sigma^2$, the quantity $\frac{S_n - n\mu}{\sqrt{n}}$ converges to $N(0, \sigma^2)$ as $n \to \infty$. The deviations stabilize around zero but with variance $\sigma^2$.
+
+For the \textbf{Normal distribution} ($\mu=1, \sigma^2=1$), the scaled deviation fluctuates within a relatively constant band (roughly $\pm 3$), consistent with $N(0, 1)$.
+
+For the \textbf{Weibull distribution} ($\alpha=0.3$), the CLT applies because the variance is finite. Calculating the variance:  
+\[ \text{Var}(X) = \beta^2 [\Gamma(1 + 2/\alpha) - \Gamma(1 + 1/\alpha)^2] \approx 29.24 \]  
+with standard deviation $\sigma \approx 5.41$. The plot shows wider fluctuations (0 to $-12$) than the Normal case, consistent with the larger standard deviation. The predominantly negative values reflect the skewness of the distribution: most samples are small, so the sum lags behind $n\mu$ unless rare large values appear.
+
+\paragraph{Why Pareto is not tested}
+
+We cannot test the Pareto distribution because the mean is infinite ($\alpha = 0.5 \le 1$). The term $n\mu$ is undefined, making the scaled deviation calculation impossible.
+
+\subsubsection*{Part (c): The 80-20 Rule}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figs/plot_1.1_c_80_20.png}
+    \caption{Fraction of total income held by the wealthiest $r\%$ of the population for Weibull and Pareto distributions.}
+    \label{fig:80_20}
+\end{figure}
+
+\paragraph{Interpretation}
+
+Pareto exhibits extreme wealth concentration: the wealthiest 2.5\% holds nearly 100\% of income. In contrast, the wealthiest 10\% of Weibull holds about 80\%. This difference is due to infinite variance in Pareto. The infinite variance allows rare but extraordinarily large values that dominate wealth distribution. Weibull, while heavy-tailed, has finite variance that constrains inequality.
+
+\subsubsection*{Part (d): Identifying Heavy Tails}
+
+\paragraph{Frequency Plots (PDF on log-log scale)}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figs/plot_1.1_d_frequency_Normal.png}
+        \caption{Normal: $R^2 = 0.039$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figs/plot_1.1_d_frequency_Weibull.png}
+        \caption{Weibull: $R^2 = 0.975$, slope $-0.83$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figs/plot_1.1_d_frequency_Pareto.png}
+        \caption{Pareto: $R^2 = 0.997$, slope $-1.48$}
+    \end{subfigure}
+    \caption{Frequency plots (PDF) on log-log scale for all three distributions.}
+    \label{fig:freq_combined}
+\end{figure}
+
+\paragraph{Rank Plots (CCDF on log-log scale)}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figs/plot_1.1_d_rank_Normal.png}
+        \caption{Normal: $R^2 = 0.632$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figs/plot_1.1_d_rank_Weibull.png}
+        \caption{Weibull: $R^2 = 0.716$, slope $-0.18$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figs/plot_1.1_d_rank_Pareto.png}
+        \caption{Pareto: $R^2 = 1.000$, slope $-0.50$}
+    \end{subfigure}
+    \caption{Rank plots (CCDF) on log-log scale for all three distributions.}
+    \label{fig:rank_combined}
+\end{figure}
+
+\paragraph{Analysis}
+
+Light-tailed (Normal): The frequency and rank plots are not linear on log-log scales. Normal decay is exponential (Gaussian), which curves on log-log scales. Both plots show poor linear fits ($R^2 = 0.039$ for frequency, $R^2 = 0.632$ for rank). This is expected for light-tailed distributions.
+
+Heavy-tailed (Weibull): The frequency plot shows better linearity ($R^2 = 0.975$) with slope $\approx -0.83$. The rank plot shows modest fit ($R^2 = 0.716$). Weibull's frequency plot approximates power-law behavior despite finite moments.
+
+Very heavy-tailed (Pareto): Both plots show nearly perfect linearity. Frequency plot: $R^2 = 0.997$, slope $-1.48$. Rank plot: $R^2 = 1.000$, slope $-0.50$ (theoretical slope for $\alpha = 0.5$). Power-law distributions manifest as straight lines on log-log plots.
+
+Light-tailed distributions do not appear linear on log-log plots. Heavy-tailed distributions show much better fits, with fit quality correlating to tail heaviness. Pareto's near-perfect fit ($R^2 \approx 1.0$) versus Weibull's good fit ($R^2 \approx 0.98$) shows that these plots effectively diagnose power laws.
+
+The rank plot (CCDF) is more reliable than the frequency plot for identifying power laws. The Pareto rank plot shows perfect linearity while Weibull's shows curvature.
+
+Outlier filtering removes noise from extreme values where few samples exist. By removing points beyond 3 standard deviations in log-space, we focus on the stable region of the power law and avoid noise at the extreme tail.
+
+The complete implementation for Problem 1.1 is provided in Appendix~\ref{app:appendix}.
+
+\newpage
+
+\subsection{The Devil is in the Details}
+
+\subsubsection*{Part (a): Preferential Attachment Model}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figs/plot_1.2_a_pa_ccdf.png}
+    \caption{Degree distribution (CCDF, log-log) for preferential attachment network with $T=300$ nodes.}
+    \label{fig:pa_ccdf}
+\end{figure}
+
+The preferential attachment model generates a scale-free network. New nodes connect to existing nodes with probability proportional to their current degree, naturally producing a power-law degree distribution visible as approximately linear on the log-log CCDF plot.
+
+\subsubsection*{Part (b): Configuration Model}
+
+\subsubsection*{Part (c): Comparison of Models}
+
+\paragraph{Degree Distribution Comparison}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figs/plot_1.2_ab_ccdf_comparison.png}
+    \caption{CCDF comparison of degree distributions. Both models have identical degree sequences by construction.}
+    \label{fig:ccdf_comparison}
+\end{figure}
+
+\paragraph{Network Structure Visualization - Layout Exploration}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figs/plot_1.2_c_pa_layouts.png}
+    \caption{Preferential Attachment network with six layout algorithms.}
+    \label{fig:pa_layouts}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figs/plot_1.2_c_cm_layouts.png}
+    \caption{Configuration Model network with same six layout algorithms.}
+    \label{fig:cm_layouts}
+\end{figure}
+
+\paragraph{Multiple Instances Comparison - Kamada-Kawai Layout}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figs/plot_1.2_c_pa_vs_cm_multiple.png}
+    \caption{Multiple instances: PA (left, blue) vs CM (right, red) with Kamada-Kawai layout.}
+    \label{fig:pa_vs_cm_multiple}
+\end{figure}
+
+\paragraph{Analysis}
+
+Despite identical degree sequences, Preferential Attachment (PA) and Configuration Model (CM) networks show dramatically different structures:
+
+\textbf{Preferential Attachment:} PA networks display ordered, hierarchical tree-like organization. The visualizations show a clear central core of highly connected hubs with progressively lower-degree nodes arranged hierarchically around them. High-degree nodes preferentially connect to each other, creating a natural social hierarchy. The Kamada-Kawai layout reveals this structure most clearly.
+
+\textbf{Configuration Model:} CM networks show random, disorganized structure despite identical degree distribution. Nodes scatter uniformly without obvious hierarchy. The center lacks a structured core. This is because CM randomly matches edges without any preferential attachment mechanism.
+
+\textbf{Key Insight:} While both networks have the same degree sequence, their structural properties differ fundamentally:
+\begin{itemize}
+    \item \textbf{Clustering:} PA has higher clustering (more triangles) due to transitivity from preferential attachment
+    \item \textbf{Mixing patterns:} PA shows assortative mixing (high-degree nodes connect to high-degree nodes), CM is neutral
+    \item \textbf{Connectivity:} PA is always connected, CM may fragment
+    \item \textbf{Small-world properties:} PA has strong core-periphery structure, CM has uniform connectivity
+\end{itemize}
+
+The Kamada-Kawai layout most effectively differentiates the two models. It transforms the abstract network structure into visible geometry, making PA's hierarchical nature immediately apparent and CM's randomness equally obvious.
+
+The complete implementation for Problem 1.2 is provided in Appendix~\ref{app:appendix}.
+
+\section{Appendix: Code Listings}
+\label{app:appendix}
+
+\subsection{Problem 1.1: Heavy vs. Light Tails (p1.py)}
+
+\lstinputlisting[language=Python, caption=Problem 1.1 Implementation]{../code/p1.py}
+
+\subsection{Problem 1.2: The Devil is in the Details (p2.py)}
+
+\lstinputlisting[language=Python, caption=Problem 1.2 Implementation]{../code/p2.py}
+
+\end{document}
