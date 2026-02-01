@@ -21,6 +21,7 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 import scipy
+import os
 
 # %%
 # Parameters
@@ -84,21 +85,28 @@ degree_norm, degree_rank = _normalize_array_by_rank(deg_lst, nr_nodes)
 # %%
 # Computing Ground-truth values and normalising them:
 
-b = [v for v in nx.betweenness_centrality(G).values()]
+bc_file = '../data/BC_norm_cent_08.npy'
+rank_file = '../data/BC_cent_rank_08.npy'
 
-BC_norm_cent, BC_cent_rank = _normalize_array_by_rank(b, nr_nodes)
-
-# Save the normalized betweenness centrality values
-np.save("BC_norm_cent.npy", BC_norm_cent)
-
-# Save teh cent rank
-np.save("BC_cent_rank.npy", BC_cent_rank)
+if os.path.exists(bc_file) and os.path.exists(rank_file):
+    print("Loading cached betweenness centrality...")
+    BC_norm_cent = np.load(bc_file)
+    BC_cent_rank = np.load(rank_file)
+else:
+    print("Computing betweenness centrality (this may take a while)...")
+    b = [v for v in nx.betweenness_centrality(G).values()]
+    BC_norm_cent, BC_cent_rank = _normalize_array_by_rank(b, nr_nodes)
+    
+    # Save the normalized betweenness centrality values
+    np.save(bc_file, BC_norm_cent)
+    # Save the cent rank
+    np.save(rank_file, BC_cent_rank)
 
 # %%
 # Define Structure2Vec
 # NO NEED TO CHANGE
 
-def Structure2Vec(G, nr_nodes, degree_norm, num_features=1, embed_size=512, layers=2):
+def Structure2Vec(G, nr_nodes, degree_norm, num_features=1, embed_size=512, layers=2, weights=None):
 
   #build feature matrix
   def get_degree(i):
@@ -119,19 +127,28 @@ def Structure2Vec(G, nr_nodes, degree_norm, num_features=1, embed_size=512, laye
   node_features = tf.cast(build_feature_matrix(), tf.float32)
   node_features = tf.reshape(node_features, dim)
 
-  initializer = tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0,
-                                                                mode="fan_avg",
-                                                                distribution="uniform")
-  #print(initializer)
+  if weights is None:
+    initializer = tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0,
+                                                                  mode="fan_avg",
+                                                                  distribution="uniform")
+    #print(initializer)
 
+    w1 = tf.Variable(initializer((num_features, embed_size)), trainable=True,
+                                    dtype=tf.float32, name="w1")
+    w2 = tf.Variable(initializer((embed_size, embed_size)), trainable=True,
+                                    dtype=tf.float32, name="w2")
+    w3 = tf.Variable(initializer((1,embed_size)), trainable=True, dtype=tf.float32, name="w3")
+    w4 = tf.Variable(initializer([]), trainable=True, dtype=tf.float32, name="w4")
+    
+    weights = {'w1': w1, 'w2': w2, 'w3': w3, 'w4': w4}
+  else:
+    w1 = weights['w1']
+    w2 = weights['w2']
+    w3 = weights['w3']
+    w4 = weights['w4']
+  
   A = tf.sparse.from_dense(A)
   A = tf.cast(A, tf.float32)
-  w1 = tf.Variable(initializer((num_features, embed_size)), trainable=True,
-                                  dtype=tf.float32, name="w1")
-  w2 = tf.Variable(initializer((embed_size, embed_size)), trainable=True,
-                                  dtype=tf.float32, name="w2")
-  w3 = tf.Variable(initializer((1,embed_size)), trainable=True, dtype=tf.float32, name="w3")
-  w4 = tf.Variable(initializer([]), trainable=True, dtype=tf.float32, name="w4")
 
   wx_all = tf.matmul(node_features, w1)  # NxE
 
@@ -155,12 +172,12 @@ def Structure2Vec(G, nr_nodes, degree_norm, num_features=1, embed_size=512, laye
 
   mu_all = current_mu
 
-  return mu_all
+  return mu_all, weights
 
 # %%
 # Converting the graph structure into vectors
 
-mu_all = Structure2Vec(G, nr_nodes, degree_norm, embed_size=EMBED_SIZE)
+mu_all, trained_weights = Structure2Vec(G, nr_nodes, degree_norm, embed_size=EMBED_SIZE)
 
 # %% [markdown]
 # ## Training a Neural Network
@@ -178,7 +195,7 @@ def build_model():
     model.add(tf.keras.layers.Dense(UNITS, activation ="relu"))
 
   model.add(tf.keras.layers.Dense(1))
-  model.compile(optimizer='sgd', loss='mse')
+  model.compile(optimizer='adam', loss='mse')
 
   model.summary()
 
@@ -218,11 +235,11 @@ for i in range(k):
 
   # Training
   callbacks =  tf.keras.callbacks.EarlyStopping(
-      monitor= 'loss', min_delta=0, patience=3, verbose=1,
-      mode='auto', baseline=None, restore_best_weights=False)
+      monitor= 'loss', min_delta=0, patience=10, verbose=1,
+      mode='auto', baseline=None, restore_best_weights=True)
 
   model.fit(partial_train_data, partial_train_targets,
-            epochs = NUM_EPOCHS, batch_size = 1, callbacks = callbacks, verbose = 1)
+            epochs = NUM_EPOCHS, batch_size = 32, callbacks = callbacks, verbose = 1)
   print("model.metrics_names: ", model.metrics_names)
 
   val_loss = model.evaluate(val_data, val_targets, verbose = 1)
@@ -244,7 +261,7 @@ kendall_tau, p_value = scipy.stats.kendalltau(BC_norm_cent,y_pred)
 # Print your kendalltau score
 # Make sure your kendalltau score is at least 0.70
 # PRINT HERE
-print(kendall_tau)
+print("\n\n\nPart 1 Kendall Tau (Gnutella 08):", kendall_tau, "\n\n\n")
 
 # %%
 # You could save this model for part 2
@@ -269,3 +286,37 @@ G2 = nx.read_edgelist(path2, comments='#', delimiter=None, create_using=nx.DiGra
 #print(nx.info(G2))
 
 
+
+# %%
+
+# Computing Ground-truth values for Gnutella 04
+deg_lst_2 = [val for (node, val) in G2.degree()]
+nr_nodes_2 = G2.number_of_nodes()
+degree_norm_2, degree_rank_2 = _normalize_array_by_rank(deg_lst_2, nr_nodes_2)
+
+bc_file_2 = '../data/BC_norm_cent_04.npy'
+rank_file_2 = '../data/BC_cent_rank_04.npy'
+
+if os.path.exists(bc_file_2) and os.path.exists(rank_file_2):
+    print("Loading cached betweenness centrality for Gnutella 04...")
+    BC_norm_cent_2 = np.load(bc_file_2)
+    BC_cent_rank_2 = np.load(rank_file_2)
+else:
+    print("Computing betweenness centrality for Gnutella 04 (this may take a while)...")
+    print("NOTE: This step produces Ground Truth using NetworkX on CPU. GPU usage will drop to 0. Please wait.")
+    b2 = [v for v in nx.betweenness_centrality(G2).values()]
+    BC_norm_cent_2, BC_cent_rank_2 = _normalize_array_by_rank(b2, nr_nodes_2)
+    # Save
+    np.save(bc_file_2, BC_norm_cent_2)
+    np.save(rank_file_2, BC_cent_rank_2)
+
+# Generate embeddings (REUSING WEIGHTS)
+mu_all_2, _ = Structure2Vec(G2, nr_nodes_2, degree_norm_2, embed_size=EMBED_SIZE, weights=trained_weights)
+
+# Predict
+x_new_2 = mu_all_2
+y_pred_2 = model.predict(x_new_2)
+
+# Evaluate
+kendall_tau_2, p_value_2 = scipy.stats.kendalltau(BC_norm_cent_2, y_pred_2)
+print("\n\n\n Part 2 Kendall Tau (Gnutella 04):", kendall_tau_2, "\n\n\n")

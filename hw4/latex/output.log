@@ -1,0 +1,175 @@
+
+Model: "sequential"
+
+ Layer (type)                          Output Shape                         Param # 
+
+ dense (Dense)                         (None, 32)                             2,080 
+
+ dense_1 (Dense)                       (None, 32)                             1,056 
+
+ dense_2 (Dense)                       (None, 32)                             1,056 
+
+ dense_3 (Dense)                       (None, 32)                             1,056 
+
+ dense_4 (Dense)                       (None, 32)                             1,056 
+
+ dense_5 (Dense)                       (None, 1)                                 33 
+
+ Total params: 6,337 (24.75 KB)
+ Trainable params: 6,337 (24.75 KB)
+ Non-trainable params: 0 (0.00 B)
+tf.Tensor([6301   64], shape=(2,), dtype=int32)
+tf.Tensor([6301], shape=(1,), dtype=int32)
+processing fold # 0
+tf.Tensor([5041   64], shape=(2,), dtype=int32)
+Epoch 1/20
+158/158  2s 5ms/step - loss: 0.1071    
+Epoch 2/20
+158/158  0s 839us/step - loss: 0.0601
+Epoch 3/20
+158/158  0s 958us/step - loss: 0.0488
+Epoch 4/20
+158/158  0s 831us/step - loss: 0.0449
+Epoch 5/20
+158/158  0s 942us/step - loss: 0.0403
+Epoch 6/20
+158/158  0s 829us/step - loss: 0.0385
+Epoch 7/20
+158/158  0s 715us/step - loss: 0.0339
+Epoch 8/20
+158/158  0s 893us/step - loss: 0.0325
+Epoch 9/20
+158/158  0s 920us/step - loss: 0.0293
+Epoch 10/20
+158/158  0s 862us/step - loss: 0.0273
+Epoch 11/20
+158/158  0s 846us/step - loss: 0.0250
+Epoch 12/20
+158/158  0s 811us/step - loss: 0.0244
+Epoch 13/20
+158/158  0s 758us/step - loss: 0.0234
+Epoch 14/20
+158/158  0s 712us/step - loss: 0.0233
+Epoch 15/20
+158/158  0s 861us/step - loss: 0.0226
+Epoch 16/20
+158/158  0s 795us/step - loss: 0.0224
+Epoch 17/20
+158/158  0s 774us/step - loss: 0.0239
+Epoch 18/20
+158/158  0s 878us/step - loss: 0.0226
+Epoch 19/20
+158/158  0s 791us/step - loss: 0.0221
+Epoch 20/20
+158/158  0s 877us/step - loss: 0.0215
+Restoring model weights from the end of the best epoch: 20.
+model.metrics_names:  ['loss']
+40/40  0s 7ms/step - loss: 0.2460  
+[0.2460017055273056]
+processing fold # 1
+tf.Tensor([5041   64], shape=(2,), dtype=int32)
+Epoch 1/20
+158/158  0s 1ms/step - loss: 0.0458  
+Epoch 2/20
+158/158  0s 1ms/step - loss: 0.0435  
+Epoch 3/20
+158/158  0s 834us/step - loss: 0.0395
+Epoch 4/20
+158/158  0s 790us/step - loss: 0.0364
+Epoch 5/20
+158/158  0s 919us/step - loss: 0.0383
+Epoch 6/20
+158/158  0s 743us/step - loss: 0.0367
+Epoch 7/20
+158/158  0s 846us/step - loss: 0.0382
+Epoch 8/20
+158/158  0s 788us/step - loss: 0.0362
+Epoch 9/20
+158/158  0s 757us/step - loss: 0.0359
+Epoch 10/20
+158/158  0s 850us/step - loss: 0.0355
+Epoch 11/20
+158/158  0s 886us/step - loss: 0.0343
+Epoch 12/20
+158/158  0s 752us/step - loss: 0.0345
+Epoch 13/20
+158/158  0s 750us/step - loss: 0.0346
+Epoch 14/20
+158/158  0s 841us/step - loss: 0.0334
+Epoch 15/20
+158/158  0s 927us/step - loss: 0.0339
+Epoch 16/20
+158/158  0s 813us/step - loss: 0.0275
+Epoch 17/20
+158/158  0s 791us/step - loss: 0.0294
+Epoch 18/20
+158/158  0s 789us/step - loss: 0.0308
+Epoch 19/20
+158/158  0s 931us/step - loss: 0.0276
+Epoch 20/20
+158/158  0s 926us/step - loss: 0.0302
+Restoring model weights from the end of the best epoch: 19.
+model.metrics_names:  ['loss']
+40/40  0s 764us/step - loss: 0.0204
+[0.2460017055273056, 0.026489466428756714, 0.03945173695683479, 0.02035539597272873]
+processing fold # 4
+tf.Tensor([5041   64], shape=(2,), dtype=int32)
+Epoch 1/20
+158/158  0s 872us/step - loss: 0.0234
+Epoch 2/20
+158/158  0s 845us/step - loss: 0.0226
+Epoch 3/20
+158/158  0s 978us/step - loss: 0.0246
+Epoch 4/20
+158/158  0s 873us/step - loss: 0.0237
+Epoch 5/20
+158/158  0s 803us/step - loss: 0.0226
+Epoch 6/20
+158/158  0s 920us/step - loss: 0.0241
+Epoch 7/20
+158/158  0s 927us/step - loss: 0.0247
+Epoch 8/20
+158/158  0s 911us/step - loss: 0.0219
+Epoch 9/20
+158/158  0s 843us/step - loss: 0.0219
+Epoch 10/20
+158/158  0s 815us/step - loss: 0.0222
+Epoch 11/20
+158/158  0s 917us/step - loss: 0.0216
+Epoch 12/20
+158/158  0s 956us/step - loss: 0.0212
+Epoch 13/20
+158/158  0s 933us/step - loss: 0.0230
+Epoch 14/20
+158/158  0s 906us/step - loss: 0.0230
+Epoch 15/20
+158/158  0s 843us/step - loss: 0.0223
+Epoch 16/20
+158/158  0s 905us/step - loss: 0.0209
+Epoch 17/20
+158/158  0s 860us/step - loss: 0.0212
+Epoch 18/20
+158/158  0s 792us/step - loss: 0.0221
+Epoch 19/20
+158/158  0s 896us/step - loss: 0.0237
+Epoch 20/20
+158/158  0s 949us/step - loss: 0.0225
+Restoring model weights from the end of the best epoch: 16.
+model.metrics_names:  ['loss']
+40/40  0s 754us/step - loss: 0.1070
+[0.2460017055273056, 0.026489466428756714, 0.03945173695683479, 0.02035539597272873, 0.1070471853017807]
+197/197  1s 2ms/step   
+
+
+
+Part 1 Kendall Tau (Gnutella 08): 0.8481805105261698 
+
+
+
+WARNING:absl:You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+Loading cached betweenness centrality for Gnutella 04...
+340/340  0s 1ms/step  
+
+
+
+ Part 2 Kendall Tau (Gnutella 04): 0.6727189830593482

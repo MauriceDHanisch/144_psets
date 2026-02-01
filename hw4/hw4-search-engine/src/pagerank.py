@@ -49,8 +49,42 @@ def compute_pagerank(graph, damping=0.85, max_iter=10000, tol=1e-8):
     if n == 0:
         return {}
 
+    # Initialize PageRank uniformly
     pr = {node: 1.0 / n for node in all_nodes}
     
+    for _ in range(max_iter):
+        new_pr = {node: 0.0 for node in all_nodes}
+        sink_pr_sum = 0.0
+        
+        # Calculate contribution from sink nodes
+        for node in all_nodes:
+            out_links = graph.get(node, [])
+            if not out_links:
+                sink_pr_sum += pr[node]
+        
+        # Distribute mass from nodes with links
+        for node in all_nodes:
+            out_links = graph.get(node, [])
+            if out_links:
+                share = (damping * pr[node]) / len(out_links)
+                for target in out_links:
+                    if target in new_pr:
+                         new_pr[target] += share
+        
+        # Add damping factor (teleportation) and sink distribution
+        # Total mass to distribute to each node from sinks and random jumps
+        base_add = ((1.0 - damping) + damping * sink_pr_sum) / n
+        
+        diff = 0.0
+        for node in all_nodes:
+            new_pr[node] += base_add
+            diff += abs(new_pr[node] - pr[node])
+            
+        pr = new_pr
+        
+        if diff < tol:
+            break
+            
     return pr
 
 
