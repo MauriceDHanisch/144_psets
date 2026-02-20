@@ -44,7 +44,6 @@ pythonenv*
 *.synctex.gz
 *.toc
 *.out
-*.pdf
 *.blg
 *.bbl
 *.run.xml
