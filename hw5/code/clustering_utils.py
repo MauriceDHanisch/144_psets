@@ -11,12 +11,13 @@ def generate_ssbm(n, k, A, B):
     A: Probability of edge within community
     B: Probability of edge between communities
     """
-    labels = np.repeat(np.arange(k), n // k)
-    # If n is not divisible by k, distribute the remaining nodes
-    remainder = n % k
-    if remainder > 0:
-        labels = np.concatenate([labels, np.arange(remainder)])
-    
+    # labels = np.repeat(np.arange(k), n // k)
+    # # If n is not divisible by k, distribute the remaining nodes
+    # remainder = n % k
+    # if remainder > 0:
+    #     labels = np.concatenate([labels, np.arange(remainder)])
+    labels = np.random.choice(k, size=n)
+
     adj = np.zeros((n, n))
     for i in range(n):
         for j in range(i + 1, n):
