@@ -2,6 +2,7 @@
 \usepackage[margin=0.5in]{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{hyperref}
@@ -137,38 +138,288 @@ The fully converged state-valuation grid $V(s)$ that drives the optimal policy i
 
 \subsection*{2.1 Routing Games with Tolls}
 
-We are given a routing game with $N$ players, each with traffic $r_i = 1$. The original link cost function is $c_e(x)$ and the original objective function is the social cost:
-$$ W(f) = \sum_{e \in E} f_e c_e(f_e) $$
-where $f_e$ is the total traffic (number of players) on edge $e$. We introduce a new cost function with a toll:
-$$ c^*_e(x) = c_e(x) + (x-1)\left(c_e(x) - c_e(x-1)\right) $$
-We must prove that the flow $f^*$ that minimizes the original social cost $W(f)$ is a pure Nash Equilibrium for the new game with costs $c^*_e(x)$. 
+We are given a routing game with $N$ players, each with traffic $r_i = 1$. The original link cost functions are $c_e(\cdot)$ and the social cost is:
+$$ W(f) = \sum_{e \in E} f_e c_e(f_e). $$
+The new tolled cost function is:
+$$ c^*_e(x) = c_e(x) + (x-1)\bigl(c_e(x) - c_e(x-1)\bigr). $$
+We must prove that any $f^*$ minimizing $W(f)$ is a pure Nash Equilibrium (NE) of the new game.
 
-To prove this, we construct the exact potential function $\Phi^*(f)$ for the new game. For any routing game with integer flows and edge costs $c^*_e(x)$, the standard Rosenthal potential function given is:
-$$ \Phi^*(f) = \sum_{e \in E} \sum_{x=1}^{f_e} c^*_e(x) $$
+\medskip
+\noindent\textbf{Step 1: Define the Rosenthal potential and show it is a valid potential function.}
 
-Let us substitute the new cost function $c^*_e(x)$ into this potential function and simplify the inner sum for a single edge $e$:
+Define the Rosenthal potential for the new game:
+$$ \Phi^*(f) = \sum_{e \in E} \sum_{x=1}^{f_e} c^*_e(x). $$
+
+We claim $\Phi^*$ is an \emph{exact potential function}: when a single player $i$ deviates from path $P$ to path $P'$, the change in $\Phi^*$ equals the change in that player's individual cost. To see this, consider player $i$ switching from $P$ to $P'$. For edges $e \in P \setminus P'$, the flow drops from $f_e$ to $f_e - 1$, so:
+$$
+\Delta_{e}\Phi^* = -c^*_e(f_e).
+$$
+For edges $e \in P' \setminus P$, the flow rises from $f_e$ to $f_e + 1$, so:
+$$
+\Delta_{e}\Phi^* = +c^*_e(f_e + 1).
+$$
+These are exactly the marginal costs player $i$ saves and incurs, which equals the change in player $i$'s total cost $\sum_{e \in P'} c^*_e(f_e+1) - \sum_{e \in P} c^*_e(f_e)$. Therefore $\Delta\Phi^* = \Delta(\text{cost of player }i)$, confirming $\Phi^*$ is a valid potential function.
+
+\medskip
+\noindent\textbf{Step 2: Any minimum of $\Phi^*$ is a Nash Equilibrium, and one exists.}
+
+Since $\Phi^*$ is an exact potential, any unilateral deviation that improves a player's cost strictly decreases $\Phi^*$. Equivalently, if $f$ is a local minimum of $\Phi^*$, no player can benefit from deviating---so $f$ is a NE. Because the set of feasible integer flows is finite (each player has finitely many paths), $\Phi^*$ attains its global minimum. Therefore, a pure NE always exists.
+
+\medskip
+\noindent\textbf{Step 3: Show $\Phi^*(f) = W(f)$, so the minimizer of $W$ is a NE.}
+
+We simplify the inner sum of $\Phi^*$ for a single edge $e$ by substituting $c^*_e$:
 \begin{align*}
-\sum_{x=1}^{f_e} c^*_e(x) &= \sum_{x=1}^{f_e} \left[ c_e(x) + (x-1)c_e(x) - (x-1)c_e(x-1) \right] \\
-&= \sum_{x=1}^{f_e} \left[ x c_e(x) - (x-1)c_e(x-1) \right]
+\sum_{x=1}^{f_e} c^*_e(x)
+  &= \sum_{x=1}^{f_e} \bigl[c_e(x) + (x-1)c_e(x) - (x-1)c_e(x-1)\bigr] \\
+  &= \sum_{x=1}^{f_e} \bigl[x\, c_e(x) - (x-1)c_e(x-1)\bigr].
 \end{align*}
+Setting $g_e(x) = x\,c_e(x)$, this is a telescoping sum:
+$$
+\sum_{x=1}^{f_e} \bigl[g_e(x) - g_e(x-1)\bigr] = g_e(f_e) - g_e(0) = f_e c_e(f_e),
+$$
+since $g_e(0)=0$. Summing over all edges:
+$$
+\Phi^*(f) = \sum_{e \in E} f_e c_e(f_e) = W(f).
+$$
 
-Notice that this inner sum is a perfect telescoping series! Let $g_e(x) = x c_e(x)$. The sum becomes:
-\begin{align*}
-\sum_{x=1}^{f_e} \left[ g_e(x) - g_e(x-1) \right] &= (g_e(1) - g_e(0)) + (g_e(2) - g_e(1)) + \dots + (g_e(f_e) - g_e(f_e-1)) \\
-&= g_e(f_e) - g_e(0)
-\end{align*}
+\medskip
+\noindent\textbf{Conclusion.}
 
-Since $g_e(0) = 0 \cdot c_e(0) = 0$, we simply have:
-$$ \sum_{x=1}^{f_e} c^*_e(x) = f_e c_e(f_e) $$
-
-Substituting this back into the full potential function $\Phi^*(f)$:
-$$ \Phi^*(f) = \sum_{e \in E} f_e c_e(f_e) = W(f) $$
-
-We have shown that the exact potential function $\Phi^*(f)$ of the new game with tolls is mathematically identical to the social cost objective function $W(f)$ of the original game. 
-
-By the fundamental property of potential games, any pure Nash Equilibrium is a local minimum of the potential function. More importantly, the global minimum of the potential function is guaranteed to be a pure Nash Equilibrium. Since $f^*$ is the optimal strategy that globally minimizes $W(f)$, and $W(f) = \Phi^*(f)$, $f^*$ globally minimizes the potential function of the new game. Therefore, $f^*$ must be a Nash Equilibrium for the new game. 
+Since $\Phi^*(f) = W(f)$, the global minimizer $f^*$ of the original social cost $W(f)$ is also the global minimizer of $\Phi^*$. By Step 2, any global minimizer of $\Phi^*$ is a pure Nash Equilibrium of the tolled game. Therefore, $f^*$ is a Nash Equilibrium. $\blacksquare$
 
 \newpage
+\subsection*{2.2 Alternating Offers}
+
+Eric gives Anagha and Albert \$3000 to split over at most three rounds. Offers must be non-negative integers. Each time an offer is \emph{rejected}, the total pool shrinks by \$1000. We solve by backward induction.
+
+\medskip
+\noindent\textbf{Part (a): Both players fully rational (maximizing own payoff).}
+
+\medskip
+\noindent\textit{Round 3 (Anagha's final offer, pool = \$1000).}
+If Albert rejects, both receive \$0. Since Albert is rational, he accepts any offer $A_3 \geq 0$ (weakly better than \$0). Anagha therefore offers Albert $A_3 = \$0$ and keeps \$1000.
+
+\begin{center}
+\textbf{Round 3 outcome: Anagha \$1000, Albert \$0.}
+\end{center}
+
+\noindent\textit{Round 2 (Albert's offer to Anagha, pool = \$2000).}
+Anagha knows she will receive \$1000 if she rejects (Round 3 outcome). She accepts iff $A_2 \geq 1000$. Albert minimizes $A_2$ to keep the rest, so Albert offers $A_2 = \$1000$.
+
+\begin{center}
+\textbf{Round 2 outcome: Anagha \$1000, Albert \$1000.}
+\end{center}
+
+\noindent\textit{Round 1 (Anagha's opening offer to Albert, pool = \$3000).}
+Albert knows he receives \$1000 if he rejects (Round 2 outcome). He accepts iff $A_1 \geq 1000$. Anagha minimizes $A_1$, so she offers $A_1 = \$1000$, keeping \$2000 for herself.
+
+\begin{center}
+\boxed{\textbf{Answer (a): Anagha offers Albert \$1000. Anagha keeps \$2000.}}
+\end{center}
+
+\medskip
+\noindent\textbf{Part (b): Albert is spiteful --- he only accepts if he gets \emph{strictly more} than Anagha, and maximizes his absolute advantage (his amount minus Anagha's). When indifferent, he rejects Anagha's offer.}
+
+\medskip
+\noindent\textit{Round 3 (Anagha's final offer, pool = \$1000).}
+If Albert rejects, both get \$0 (advantage = 0). Albert accepts Anagha's offer of $A_3$ only if:
+\begin{enumerate}
+    \item $A_3 > 1000 - A_3$ (strictly more than Anagha), i.e.\ $A_3 \geq 501$.
+    \item His advantage from accepting $2A_3 - 1000 > 0$, i.e.\ $A_3 \geq 501$.
+    \item He is not indifferent: since rejection gives advantage 0, he rejects whenever $2A_3 - 1000 = 0$, i.e.\ $A_3 = 500$ (here he does not get strictly more anyway, so this is covered).
+\end{enumerate}
+
+Anagha wants to maximize her share $1000 - A_3$. To secure acceptance she must offer $A_3 = 501$, giving herself $\$499$. Offering $A_3 \leq 500$ leads to rejection and \$0 for Anagha. Since $499 > 0$, Anagha offers \$501.
+
+\begin{center}
+\textbf{Round 3 outcome: Anagha \$499, Albert \$501 (advantage $= +\$2$).}
+\end{center}
+
+\noindent\textit{Round 2 (Albert's offer to Anagha, pool = \$2000).}
+Anagha accepts iff $A_2 \geq 499$ (her Round 3 payoff). Albert wants $2000 - A_2 > A_2$ (strictly more), i.e.\ $A_2 \leq 999$, and maximizes his advantage $2000 - 2A_2$ by minimizing $A_2$. The minimum acceptable to Anagha is $A_2 = 499$. Albert offers $A_2 = \$499$, keeping $\$1501$ with advantage $1501 - 499 = \$1002$.
+
+\begin{center}
+\textbf{Round 2 outcome: Anagha \$499, Albert \$1501 (advantage $= +\$1002$).}
+\end{center}
+
+\noindent\textit{Round 1 (Anagha's opening offer to Albert, pool = \$3000).}
+Albert accepts iff:
+\begin{enumerate}
+    \item $A_1 > 3000 - A_1$, i.e.\ $A_1 \geq 1501$.
+    \item His advantage from accepting $2A_1 - 3000$ strictly exceeds his advantage from rejecting $\$1002$, i.e.\ $A_1 > 2001$, meaning $A_1 \geq 2002$ (integers).
+    \item He does not reject out of spite: at $A_1 = 2001$, advantage $= 1002 = $ rejection advantage, so he rejects (indifference $\Rightarrow$ reject).
+\end{enumerate}
+
+Anagha keeps $3000 - A_1$. Offering $A_1 = 2002$ yields $\$998$ for herself, which is better than the $\$499$ she would get if Albert rejects (Round 2 outcome). Any offer $A_1 \leq 2001$ is rejected, leaving Anagha with \$499.
+
+Since $998 > 499$, Anagha offers exactly $A_1 = \$2002$.
+
+\begin{center}
+\boxed{\textbf{Answer (b): Anagha offers Albert \$2002. Anagha keeps \$998.}}
+\end{center}
+
+
+\newpage
+\subsection*{2.3 Infinite Equilibria}
+
+\textbf{Answer:} No, I do not agree with Ann. Ann's statement holds for $m \le 2$, but fails for any $m \geq 3$. Thus, the maximum $m$ such that her statement holds is $\mathbf{m = 2}$.
+
+\medskip
+\noindent\textbf{1. Why Ann's statement holds for $m=2$ (Upper Bound Proof)}
+
+Consider a general $2 \times 2$ game where all 4 payoffs for a player are distinctly different. A generic game has at most 3 Nash Equilibria (up to 2 pure and 1 totally mixed). For there to be an infinite number of equilibria, there must be a \emph{continuous family} of mixed-strategy equilibria. This continuous family implies at least one player must be willing to play a continuous range of probability mixtures, which means the \emph{other} player must be totally indifferent between their actions for that entire range of mixtures.
+
+Let Column's mixture be $(q, 1-q)$. Consider the generic $2\times 2$ payoff matrix for Row:
+
+\begin{center}
+\begin{tabular}{c|c|c|}
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{$L$} & \multicolumn{1}{c}{$R$} \\ \cline{2-3}
+$A$ & $a, \cdot$ & $b, \cdot$ \\ \cline{2-3}
+$B$ & $c, \cdot$ & $d, \cdot$ \\ \cline{2-3}
+\end{tabular}
+\end{center}
+
+where $a, b, c, d$ are all distinct (Ann's assumption). For Row to be indifferent between $A$ and $B$, it must be that:
+
+$$ q \cdot u_r(A, L) + (1-q) \cdot u_r(A, R) = q \cdot u_r(B, L) + (1-q) \cdot u_r(B, R) $$
+Rearranging yields a linear equation in $q$:
+$$ q [u_r(A, L) - u_r(B, L) - u_r(A, R) + u_r(B, R)] = u_r(B, R) - u_r(A, R) $$
+Since all payoffs for Row are distinct, we strictly have $u_r(B, R) \neq u_r(A, R)$, meaning the right-hand side is non-zero. The only way this equation holds for a continuous range of $q$ is if both the coefficient of $q$ and the right-hand side are strictly $0$ (which is impossible as proven). Thus, this equation has \textbf{at most one} root $q^* \in (0, 1)$. 
+
+Therefore, Column must play exactly $q^*$ for Row to mix, and similarly Row must play exactly $p^*$ for Column to mix. Because there is exactly one probability distribution that makes the other indifferent, there is at most one totally mixed Nash equilibrium $(p^*, q^*)$. Since both pure and mixed equilibria are finite, the total number of Nash equilibria in a $2 \times 2$ game with distinct payoffs is finite. Ann's statement holds for $m=2$.
+
+\medskip
+\noindent\textbf{2. Counterexample for $\mathbf{m=3}$}
+
+Consider the following $3 \times 3$ payoff matrix:
+
+\begin{center}
+\begin{tabular}{c|c|c|c|}
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{$L$} & \multicolumn{1}{c}{$C$} & \multicolumn{1}{c}{$R$} \\ \cline{2-4}
+$T$ & $1, 10$ & $11, 2$ & $6, 6$ \\ \cline{2-4}
+$M$ & $12, 0$ & $0, 8$ & $4, 4$ \\ \cline{2-4}
+$B$ & $2, 1$ & $3, 3$ & $5, 5$ \\ \cline{2-4}
+\end{tabular}
+\end{center}
+
+Notice that all 9 payoffs for Row $(1, 11, 6, 12, 0, 4, 2, 3, 5)$ are strictly distinct. All 9 payoffs for Column $(10, 2, 6, 0, 8, 4, 1, 3, 5)$ are also strictly distinct. Ann's assumption is perfectly satisfied.
+
+Suppose Row plays the mixed strategy $p = (0.5, 0.5, 0)$. Let us calculate Column's expected payoffs:
+\begin{itemize}
+    \item $E_c[L] = 0.5(10) + 0.5(0) = 5$
+    \item $E_c[C] = 0.5(2) + 0.5(8) = 5$
+    \item $E_c[R] = 0.5(6) + 0.5(4) = 5$
+\end{itemize}
+Column is perfectly indifferent among all three actions! Therefore, Column can play \emph{any} mixed strategy $q = (q_1, q_2, q_3)$ without losing utility.
+
+Next, we need Column to play a mixed strategy that makes Row indifferent between $T$ and $M$ while $B$ remains strictly worse as a best response. Let Column play a mixture $q$:
+\begin{align*}
+    E_r[T] &= q_1 + 11q_2 + 6q_3 \\
+    E_r[M] &= 12q_1 + 0q_2 + 4q_3 
+\end{align*}
+Setting $E_r[T] = E_r[M]$ and substituting $q_3 = 1 - q_1 - q_2$ yields:
+$$ 6 - 5q_1 + 5q_2 = 4 + 8q_1 - 4q_2 \implies \mathbf{13q_1 - 9q_2 = 2} $$
+Because this equality defines a line segment in the standard simplex space, there are an \textbf{\emph{infinite}} number of valid $(q_1, q_2, q_3)$ distributions. For example, if we pick $q_1 = 4/13 \approx 0.307$, we get $q_2 = 2/9 \approx 0.222$ and $q_3 \approx 0.470$. At this distribution point, Row's expected payoffs are:
+\begin{itemize}
+    \item $E_r[T] = E_r[M] = \frac{652}{117} \approx \mathbf{5.57}$
+    \item $E_r[B] = 2(\frac{36}{117}) + 3(\frac{26}{117}) + 5(\frac{55}{117}) = \frac{425}{117} \approx \mathbf{3.63}$
+\end{itemize}
+Since $E_r[T] = E_r[M] > E_r[B]$ strictly, playing $(0.5, 0.5, 0)$ is a valid best response for Row. 
+
+Thus, any strategy profile where Row plays $(0.5, 0.5, 0)$ and Column plays $(q_1, q_2, 1 - q_1 - q_2)$ satisfying $13q_1 - 9q_2 = 2$ corresponds to a Nash Equilibrium. Since there are uncountably infinite points on that line segment, there are infinite equilibria. 
+
+
+\newpage
+\subsection*{2.4 PoA Analysis for Generalized Second Price Auction}
+
+\noindent\textbf{Part (a): The pure PoA can be arbitrarily large ($n=2$).}
+
+\medskip
+For any $r > 1$, set $n=2$ with the following parameters:
+\begin{itemize}
+    \item Valuations: $v_1 = r$, $v_2 = 1$ (so advertiser 1 is higher-value).
+    \item Clicks: $\alpha_1 = 1$, $\alpha_2 = 0$ (slot 2 gives no clicks).
+    \item Bids: $b_1 = 0$, $b_2 = r + 1$.
+\end{itemize}
+
+\noindent\textit{This is a pure NE:}
+\begin{itemize}
+    \item Advertiser 2 wins slot 1, pays $b_1 = 0$, earning utility $\alpha_1(v_2 - 0) = 1 > 0$. Deviating to slot 2 yields $\alpha_2 v_2 = 0 < 1$. No incentive to deviate.
+    \item Advertiser 1 is in slot 2 with utility $\alpha_2 v_1 = 0$. Deviating to slot 1 requires outbidding $b_2 = r+1 > v_1 = r$, giving utility $\alpha_1(v_1 - b_2) = r - (r+1) = -1 < 0$. No incentive to deviate.
+\end{itemize}
+
+The optimal allocation assigns advertiser 1 to slot 1:
+$$ W(b^*) = \alpha_1 v_1 + \alpha_2 v_2 = r, \qquad W(\text{NE}) = \alpha_1 v_2 + \alpha_2 v_1 = 1. $$
+$$\text{PPoA} = \frac{r}{1} = r. \qquad \blacksquare$$
+
+\medskip
+\noindent\textbf{Part (b)(i): Dominated strategy in the example.}
+
+\medskip
+In the above NE, advertiser 2 bids $b_2 = r + 1 > v_2 = 1$, a non-conservative bid. This is a \emph{dominated strategy}. The conservative bid $b_2' = v_2 = 1$ weakly dominates $b_2$:
+\begin{itemize}
+    \item If $b_1 < v_2 = 1$: advertiser 2 wins slot 1 with either bid, paying $b_1$ either way. Utilities are identical.
+    \item If $b_1 \in (v_2, b_2) = (1, r+1)$: with $b_2 = r+1$, advertiser 2 still wins slot 1 but pays $b_1 > v_2$, getting utility $v_2 - b_1 < 0$. With $b_2' = 1 < b_1$, advertiser 2 drops to slot 2, paying 0, getting utility $\alpha_2 v_2 = 0 > v_2 - b_1$. The conservative bid is \emph{strictly} better.
+    \item If $b_1 \geq b_2$: advertiser 2 is in slot 2 in both cases. Same utility.
+\end{itemize}
+The \textbf{risk} of overbidding: if an opponent bids between $v_2$ and $b_2$, advertiser 2 wins a slot but pays more per click than the click is worth, guaranteeing negative utility. The conservative bid avoids this exposure entirely.
+
+\medskip
+\noindent\textbf{Part (b)(ii): Non-conservative bids are always dominated ($n \geq 2$).}
+
+\medskip
+\noindent\textit{Claim:} For any advertiser $i$ with $b_i > v_i$, the bid $b_i' = v_i$ weakly dominates $b_i$.
+
+Fix all other bids $b_{-i}$. Let $j$ be the slot advertiser $i$ wins with $b_i$, and $j'$ with $b_i'$. Since $b_i' < b_i$, we have $j \leq j'$ (weakly better or same slot with the higher bid).
+
+\begin{itemize}
+    \item \textbf{Same slot} ($j = j' $): The price paid per click is determined solely by the next-highest bid, which is unchanged. Utilities are equal.
+    \item \textbf{Strictly better slot with $b_i$} ($j < j'$): Advertiser $i$ gained slot $j$ by outbidding some advertiser $k$ whose bid $b_k$ satisfies $v_i = b_i' \leq b_k < b_i$. Advertiser $i$ then pays $b_k \geq v_i$ per click in slot $j$, earning utility $\alpha_j(v_i - b_k) \leq 0$. With $b_i' = v_i$, advertiser $i$ occupies slot $j' > j$ and pays at most $b_k' < v_i$ per click (any bid below $v_i$ that beat out), yielding utility $\alpha_{j'}(v_i - b_k') \geq 0$. The conservative bid is \emph{strictly better} whenever this case occurs.
+\end{itemize}
+Thus $b_i' = v_i$ weakly dominates $b_i > v_i$, with a strict improvement whenever the higher bid ``wins'' a slot at a price above $v_i$. $\blacksquare$
+
+\medskip
+\noindent\textbf{Part (b)(iii): With $n=2$ and both advertisers conservative, PPoA $\leq 1.25$; this bound is tight.}
+
+\medskip
+\noindent\textit{Upper bound proof.} Following the hint, scale so that $\alpha_1 = 1$, $\alpha_2 = r \leq 1$, $v_1 + r v_2 = 1$, $v_1 > v_2 > 0$. The optimal welfare is $W^* = 1$.
+
+If the NE has the correct allocation (advertiser 1 in slot 1), $W(\text{NE}) = W^* = 1$, and the ratio is 1. Now suppose the NE has the \emph{reversed} allocation (advertiser 2 bids $b_2 \leq v_2$ and wins slot 1; advertiser 1 bids $b_1 < b_2$ and is in slot 2). NE conditions require:
+\begin{enumerate}
+    \item Advertiser 1 prefers slot 2: $\alpha_2 v_1 \geq \alpha_1(v_1 - b_2) \Rightarrow b_2 \geq v_1(1-r).$
+    \item Advertiser 2 prefers slot 1: $\alpha_1(v_2 - b_1) \geq \alpha_2 v_2 \Rightarrow b_1 \leq v_2(1-r).$
+    \item Conservative bids: $b_2 \leq v_2$ (combined with condition 1: $v_1(1-r) \leq v_2$).
+\end{enumerate}
+
+The welfare ratio in the reversed NE is:
+$$\rho = \frac{W^*}{W(\text{NE})} = \frac{v_1 + rv_2}{v_2 + rv_1}.$$
+We claim $\rho \leq 5/4$. This is equivalent to $4(v_1 + rv_2) \leq 5(v_2 + rv_1)$, i.e., $v_1(4-5r) \leq v_2(5-4r)$.
+
+\begin{itemize}
+    \item If $r \geq 4/5$: LHS $= v_1(4-5r) \leq 0$, while RHS $= v_2(5-4r) > 0$ (since $r < 5/4$). Done.
+    \item If $r < 4/5$: We need $v_2/v_1 \geq (4-5r)/(5-4r)$. From condition 3 of the NE, $v_2 \geq v_1(1-r)$, so it suffices to check $(1-r) \geq (4-5r)/(5-4r)$, i.e., $(1-r)(5-4r) \geq 4-5r$:
+    $$5 - 9r + 4r^2 \geq 4-5r \iff 1 - 4r + 4r^2 \geq 0 \iff (1-2r)^2 \geq 0. \checkmark$$
+\end{itemize}
+Therefore $\rho \leq 5/4$ in all cases, so PPoA $\leq 1.25$. $\blacksquare$
+
+\medskip
+\noindent\textit{Tight example achieving PPoA $= 1.25$.} Equality holds when $(1-2r)^2 = 0$, i.e., $r = \alpha_2/\alpha_1 = 1/2$, and $v_2/v_1 = 1-r = 1/2$.
+
+Set:
+\begin{center}
+    $\alpha_1 = 1, \quad \alpha_2 = \tfrac{1}{2}, \quad v_1 = 2, \quad v_2 = 1, \quad b_1 = 0, \quad b_2 = 1.$
+\end{center}
+
+Advertiser 2 wins slot 1 (bids $b_2 = 1 > b_1 = 0$), pays $b_1 = 0$ per click:
+\begin{itemize}
+    \item Advertiser 2: utility $= \alpha_1(v_2 - 0) = 1$. Dropping to slot 2 gives $\alpha_2 v_2 = 0.5 < 1$. No deviation. 
+    \item Advertiser 1: utility $= \alpha_2 v_1 = 1$. Raising bid to win slot 1 pays $b_2 = 1 = v_2$, giving $\alpha_1(v_1 - 1) = 1$. Indifferent (no strict improvement). 
+\end{itemize}
+This is a valid conservative pure NE ($b_2 = v_2$, $b_1 = 0 \leq v_1$). The welfare:
+$$W(\text{NE}) = \alpha_1 v_2 + \alpha_2 v_1 = 1 + 1 = 2, \qquad W^* = \alpha_1 v_1 + \alpha_2 v_2 = 2 + 0.5 = 2.5.$$
+$$\text{PPoA} = \frac{2.5}{2} = 1.25. \qquad \blacksquare$$
+
 \appendix
 \section{Code Listing}
 \label{sec:code}
